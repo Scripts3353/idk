@@ -4,34 +4,33 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Animal Company JSON Maker</title>
-  <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.22.5/babel.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/framer-motion@10.12.16/dist/framer-motion.js"></script>
-  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <link rel="shortcut icon" href="_assets/images/2d0b56e7e51cf11036ad8734bdb67e2d.png">
-  <link rel="icon" href="_assets/images/e53c4bd8da5e491d9ab09e7cf0daf874.png" sizes="192x192">
-  <link rel="apple-touch-icon" href="_assets/images/725b756a69a7d4c235070e51acd85560.png" sizes="180x180">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <style>
     body {
-      font-family: 'Canva Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-      background: linear-gradient(135deg, #1a1a1a, #2c3e50);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: linear-gradient(135deg, #1e40af, #7c3aed);
       min-height: 100vh;
       margin: 0;
       display: flex;
       justify-content: center;
       align-items: center;
       overflow-x: hidden;
+      color: white;
     }
     .gradient-text {
-      background: linear-gradient(90deg, #00C4CC, #7D2AE8);
+      background: linear-gradient(90deg, #22d3ee, #ec4899);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
     .glow-button {
       position: relative;
       overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .glow-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
     }
     .glow-button::after {
       content: '';
@@ -40,390 +39,200 @@
       left: -100%;
       width: 100%;
       height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-      transition: left 0.5s ease;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+      transition: left 0.6s ease;
     }
     .glow-button:hover::after {
       left: 100%;
     }
-    .modal-content {
-      backdrop-filter: blur(8px);
+    .modal {
+      display: none;
+      position: fixed;
+      top: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 400px;
       background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
       border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      padding: 2rem;
+      z-index: 1000;
+    }
+    .modal.active {
+      display: block;
+    }
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      z-index: 999;
+    }
+    .modal-backdrop.active {
+      display: block;
+    }
+    @media (max-width: 640px) {
+      .modal {
+        top: auto;
+        bottom: 0;
+        left: 0;
+        transform: none;
+        width: 100%;
+        border-radius: 16px 16px 0 0;
+      }
+    }
+    .content-container {
+      opacity: 0;
+    }
+    .footer-container {
+      opacity: 0;
     }
   </style>
 </head>
 <body>
-  <div id="root"></div>
-  <script type="text/babel">
-    const { useState, useEffect } = React;
-    const { motion, AnimatePresence } = window.FramerMotion;
+  <div class="content-container flex flex-col items-center justify-center min-h-screen px-4">
+    <div class="bg-white bg-opacity-10 rounded-3xl p-8 sm:p-12 max-w-lg w-full text-center shadow-2xl">
+      <h1 class="text-3xl sm:text-5xl font-bold gradient-text mb-8">Animal Company JSON Maker</h1>
+      <a
+        href="https://ac-json-maker.created.app"
+        target="_blank"
+        rel="noopener nofollow"
+        class="glow-button block bg-gradient-to-r from-cyan-400 to-blue-500 text-white font-semibold py-3 px-6 rounded-full mb-4 w-full text-lg"
+      >
+        Create JSON Now
+      </a>
+      <a
+        href="https://discord.gg/m4wXr4rEE8"
+        target="_blank"
+        rel="noopener nofollow"
+        class="glow-button block bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold py-3 px-6 rounded-full w-full text-lg"
+      >
+        Join Our Discord
+      </a>
+    </div>
+    <div class="footer-container mt-8 flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
+      <button
+        id="report-button"
+        class="glow-button bg-white bg-opacity-10 text-white font-semibold py-2 px-6 rounded-full hover:bg-opacity-20"
+      >
+        Terms & Support
+      </button>
+      <a
+        href="https://www.canva.com"
+        target="_blank"
+        rel="noopener"
+        class="glow-button bg-white bg-opacity-20 text-white font-semibold py-2 px-6 rounded-full hover:bg-opacity-30 flex items-center justify-center"
+      >
+        Designed with Canva
+        <svg class="ml-2 h-5" viewBox="0 0 80 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M79.444 18.096c-.136 0-.26.088-.324.272-.82 2.34-1.928 3.732-2.84 3.732-.524 0-.736-.584-.736-1.5 0-2.292 1.372-7.152 2.064-9.368.08-.268.132-.508.132-.712 0-.644-.352-.96-1.224-.96-.94 0-1.952.368-2.936 2.092-.34-1.52-1.368-2.184-2.804-2.184-1.66 0-3.264 1.068-4.584 2.8-1.32 1.732-2.872 2.3-4.04 2.02.84-2.056 1.152-3.592 1.152-4.732 0-1.788-.884-2.868-2.312-2.868-2.172 0-3.424 2.072-3.424 4.252 0 1.684.764 3.416 2.444 4.256-1.408 3.184-3.464 6.064-4.244 6.064-1.008 0-1.304-4.932-1.248-8.46.036-2.024.204-2.128.204-2.74 0-.352-.228-.592-1.144-.592-2.136 0-2.796 1.808-2.896 3.884a10.233 10.233 0 01-.368 2.332c-.892 3.184-2.732 5.6-3.932 5.6-.556 0-.708-.556-.708-1.284 0-2.292 1.284-5.156 1.284-7.6 0-1.796-.788-2.932-2.272-2.932-1.748 0-4.06 2.08-6.248 5.976.72-2.984 1.016-5.872-1.116-5.872A2.886 2.886 0 0036 9.916a.752.752 0 00-.432.728c.204 3.176-2.56 11.312-5.18 11.312-.476 0-.708-.516-.708-1.348 0-2.296 1.368-7.144 2.056-9.364.088-.288.136-.536.136-.752 0-.608-.376-.92-1.228-.92-.936 0-1.952.356-2.932 2.08-.344-1.52-1.372-2.184-2.808-2.184-2.356 0-4.988 2.492-6.144 5.74-1.548 4.336-4.668 8.524-8.868 8.524-3.812 0-5.824-3.172-5.824-8.184C4.068 8.312 9.38 2.4 13.32 2.4c1.884 0 2.784 1.2 2.784 3.04 0 2.228-1.244 3.264-1.244 4.112 0 .26.216.516.644.516 1.712 0 3.728-2.012 3.728-4.756S17.004.56 13.064.56C6.552.56 0 7.112 0 15.508c0 6.68 3.296 10.708 8.996 10.708 3.888 0 7.284-3.024 9.116-6.552.208 2.924 1.536 4.452 3.56 4.452 1.8 0 3.256-1.072 4.368-2.956.428 1.972 1.564 2.936 3.04 2.936 1.692 0 3.108-1.072 4.456-3.064-.02 1.564.336 3.036 1.692 3.036.64 0 1.404-.148 1.54-.708 1.428-5.904 4.956-10.724 6.036-10.724.32 0 .408.308.408.672 0 1.604-1.132 4.892-1.132 6.992 0 2.268.964 3.768 2.956 3.768 2.208 0 4.452-2.704 5.948-6.656.468 3.692 1.48 6.672 3.064 6.672 1.944 0 5.396-4.092 7.488-8.424.82.104 2.052.076 3.236-.76-.504 1.276-.8 2.672-.8 4.068 0 4.02 1.92 5.148 3.572 5.148 1.796 0 3.252-1.072 4.368-2.956.368 1.7 1.308 2.932 3.036 2.932 2.704 0 5.052-2.764 5.052-5.032 0-.6-.256-.964-.556-.964z"
+            fill="#fff"
+          />
+        </svg>
+      </a>
+    </div>
+  </div>
+  <div id="modal-backdrop" class="modal-backdrop"></div>
+  <div id="modal" class="modal">
+    <div id="form-step-terms" class="form-content">
+      <h2 class="text-2xl font-bold text-gray-900 mb-4">Terms & Support</h2>
+      <p class="text-gray-600 mb-6 text-sm">
+        This website is created with Canva, subject to our
+        <a href="https://www.canva.com/policies/terms-of-use/" target="_blank" rel="noopener" class="text-purple-600 hover:underline"> Terms of Use</a>.
+        Report any content that violates our
+        <a href="https://www.canva.com/policies/acceptable-use-policy/" target="_blank" rel="noopener" class="text-purple-600 hover:underline"> Acceptable Use Policy</a>.
+      </p>
+      <div class="flex justify-end space-x-3">
+        <button id="close-modal" class="px-4 py-2 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200">Close</button>
+        <button id="report-next" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">Report</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('Page loaded, initializing animations and event listeners...');
 
-    const App = () => {
-      const [isModalOpen, setIsModalOpen] = useState(false);
-      const [formStep, setFormStep] = useState(0);
-      const [reportReason, setReportReason] = useState('0');
-      const [captchaResponse, setCaptchaResponse] = useState(null);
+      // GSAP Animations
+      gsap.from('.content-container', {
+        opacity: 0,
+        y: 100,
+        duration: 1,
+        ease: 'power3.out'
+      });
+      gsap.from('.footer-container', {
+        opacity: 0,
+        y: 50,
+        duration: 1,
+        delay: 0.3,
+        ease: 'power3.out'
+      });
+      gsap.from('h1', {
+        scale: 0.8,
+        opacity: 0,
+        duration: 0.8,
+        delay: 0.2,
+        ease: 'back.out(1.7)'
+      });
+      gsap.from('.glow-button', {
+        opacity: 0,
+        y: 20,
+        duration: 0.6,
+        stagger: 0.2,
+        delay: 0.5,
+        ease: 'power2.out'
+      });
 
-      const handleReportClick = () => {
-        setIsModalOpen(true);
-        setFormStep(0);
+      // Modal Logic
+      const modal = document.getElementById('modal');
+      const backdrop = document.getElementById('modal-backdrop');
+      const reportButton = document.getElementById('report-button');
+      const closeModalButton = document.getElementById('close-modal');
+      const reportNextButton = document.getElementById('report-next');
+
+      const openModal = () => {
+        console.log('Opening modal...');
+        modal.classList.add('active');
+        backdrop.classList.add('active');
+        gsap.fromTo(modal, 
+          { y: '100%', opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.4, ease: 'power2.out' }
+        );
       };
 
-      const handleCloseModal = () => {
-        setIsModalOpen(false);
-        setFormStep(0);
+      const closeModal = () => {
+        console.log('Closing modal...');
+        gsap.to(modal, {
+          y: '100%',
+          opacity: 0,
+          duration: 0.4,
+          ease: 'power2.in',
+          onComplete: () => {
+            modal.classList.remove('active');
+            backdrop.classList.remove('active');
+          }
+        });
       };
 
-      const handleNextStep = () => {
-        if (formStep === 0) setFormStep(1);
-        else if (formStep === 1) {
-          if (reportReason === '4') setFormStep(5);
-          else if (reportReason === '7') setFormStep(4);
-          else setFormStep(2);
+      reportButton.addEventListener('click', openModal);
+      closeModalButton.addEventListener('click', closeModal);
+      backdrop.addEventListener('click', closeModal);
+      reportNextButton.addEventListener('click', () => {
+        alert('Report functionality requires additional setup. Please contact support at privacy@canva.com.');
+      });
+
+      // Prevent right-click on images (if any)
+      document.addEventListener('contextmenu', (e) => {
+        if (['IMG', 'VIDEO', 'SVG', 'PICTURE'].includes(e.target.tagName.toUpperCase())) {
+          e.preventDefault();
         }
-      };
+      });
 
-      const handleBack = () => {
-        if (formStep === 5 || formStep === 4) setFormStep(1);
-        else if (formStep === 2) setFormStep(1);
-      };
-
-      const handleSubmit = (e) => {
-        e.preventDefault();
-        if (!captchaResponse) {
-          document.getElementById('error_message_captcha').style.display = 'block';
-          return;
-        }
-        fetch('/_api/report', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ reason: reportReason, challenge: captchaResponse }),
-        })
-          .then((res) => {
-            if (res.ok) setFormStep(3);
-            else document.getElementById('error_message').style.display = 'block';
-          })
-          .catch(() => {
-            document.getElementById('error_message').style.display = 'block';
-          });
-      };
-
-      window.grecaptchaCallback = (response) => {
-        setCaptchaResponse(response);
-      };
-
-      return (
-        <div className="flex flex-col items-center justify-center min-h-screen text-white">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: 'easeOut' }}
-            className="bg-white bg-opacity-10 rounded-2xl p-10 shadow-2xl max-w-md w-full text-center"
-          >
-            <motion.h1
-              className="text-4xl font-bold gradient-text mb-6"
-              initial={{ scale: 0.8 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              Animal Company JSON Maker
-            </motion.h1>
-            <motion.a
-              href="https://ac-json-maker.created.app"
-              target="_blank"
-              rel="noopener nofollow"
-              className="glow-button inline-block bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-semibold py-3 px-6 rounded-full mb-4 w-full hover:from-cyan-600 hover:to-purple-600 transition-all duration-300"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Create JSON Now
-            </motion.a>
-            <motion.a
-              href="https://discord.gg/m4wXr4rEE8"
-              target="_blank"
-              rel="noopener nofollow"
-              className="glow-button inline-block bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold py-3 px-6 rounded-full w-full hover:from-purple-600 hover:to-pink-600 transition-all duration-300"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Join Our Discord
-            </motion.a>
-          </motion.div>
-
-          <motion.div
-            className="mt-8 flex space-x-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-          >
-            <button
-              onClick={handleReportClick}
-              className="footer-pill bg-white bg-opacity-10 text-white font-semibold py-2 px-4 rounded-full hover:bg-opacity-20 transition-all duration-300"
-            >
-              Terms & Support
-            </button>
-            <a
-              href="https://www.canva.com"
-              target="_blank"
-              className="footer-pill bg-white bg-opacity-20 text-white font-semibold py-2 px-4 rounded-full hover:bg-opacity-30 transition-all duration-300 flex items-center"
-            >
-              Designed with Canva
-              <svg
-                className="ml-2 h-4"
-                viewBox="0 0 80 30"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M79.444 18.096c-.136 0-.26.088-.324.272-.82 2.34-1.928 3.732-2.84 3.732-.524 0-.736-.584-.736-1.5 0-2.292 1.372-7.152 2.064-9.368.08-.268.132-.508.132-.712 0-.644-.352-.96-1.224-.96-.94 0-1.952.368-2.936 2.092-.34-1.52-1.368-2.184-2.804-2.184-1.66 0-3.264 1.068-4.584 2.8-1.32 1.732-2.872 2.3-4.04 2.02.84-2.056 1.152-3.592 1.152-4.732 0-1.788-.884-2.868-2.312-2.868-2.172 0-3.424 2.072-3.424 4.252 0 1.684.764 3.416 2.444 4.256-1.408 3.184-3.464 6.064-4.244 6.064-1.008 0-1.304-4.932-1.248-8.46.036-2.024.204-2.128.204-2.74 0-.352-.228-.592-1.144-.592-2.136 0-2.796 1.808-2.896 3.884a10.233 10.233 0 01-.368 2.332c-.892 3.184-2.732 5.6-3.932 5.6-.556 0-.708-.556-.708-1.284 0-2.292 1.284-5.156 1.284-7.6 0-1.796-.788-2.932-2.272-2.932-1.748 0-4.06 2.08-6.248 5.976.72-2.984 1.016-5.872-1.116-5.872A2.886 2.886 0 0036 9.916a.752.752 0 00-.432.728c.204 3.176-2.56 11.312-5.18 11.312-.476 0-.708-.516-.708-1.348 0-2.296 1.368-7.144 2.056-9.364.088-.288.136-.536.136-.752 0-.608-.376-.92-1.228-.92-.936 0-1.952.356-2.932 2.08-.344-1.52-1.372-2.184-2.808-2.184-2.356 0-4.988 2.492-6.144 5.74-1.548 4.336-4.668 8.524-8.868 8.524-3.812 0-5.824-3.172-5.824-8.184C4.068 8.312 9.38 2.4 13.32 2.4c1.884 0 2.784 1.2 2.784 3.04 0 2.228-1.244 3.264-1.244 4.112 0 .26.216.516.644.516 1.712 0 3.728-2.012 3.728-4.756S17.004.56 13.064.56C6.552.56 0 7.112 0 15.508c0 6.68 3.296 10.708 8.996 10.708 3.888 0 7.284-3.024 9.116-6.552.208 2.924 1.536 4.452 3.56 4.452 1.8 0 3.256-1.072 4.368-2.956.428 1.972 1.564 2.936 3.04 2.936 1.692 0 3.108-1.072 4.456-3.064-.02 1.564.336 3.036 1.692 3.036.64 0 1.404-.148 1.54-.708 1.428-5.904 4.956-10.724 6.036-10.724.32 0 .408.308.408.672 0 1.604-1.132 4.892-1.132 6.992 0 2.268.964 3.768 2.956 3.768 2.208 0 4.452-2.704 5.948-6.656.468 3.692 1.48 6.672 3.064 6.672 1.944 0 5.396-4.092 7.488-8.424.82.104 2.052.076 3.236-.76-.504 1.276-.8 2.672-.8 4.068 0 4.02 1.92 5.148 3.572 5.148 1.796 0 3.252-1.072 4.368-2.956.368 1.7 1.308 2.932 3.036 2.932 2.704 0 5.052-2.764 5.052-5.032 0-.6-.256-.964-.556-.964zM23.32 21.888c-1.092 0-1.52-1.1-1.52-2.74 0-2.848 1.948-7.604 4.008-7.604.9 0 1.24 1.06 1.24 2.356 0 2.892-1.852 7.988-3.728 7.988zm37.404-8.5c-.652-.776-.888-1.832-.888-2.772 0-1.16.424-2.14.932-2.14s.664.5.664 1.196c0 1.164-.416 2.864-.708 3.716zm8.468 8.5c-1.092 0-1.52-1.264-1.52-2.74 0-2.748 1.948-7.604 4.024-7.604.9 0 1.22 1.052 1.22 2.356 0 2.892-1.82 7.988-3.724 7.988z"
-                  fill="#fff"
-                />
-              </svg>
-            </a>
-          </motion.div>
-
-          <AnimatePresence>
-            {isModalOpen && (
-              <>
-                <motion.div
-                  className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.35 }}
-                  onClick={handleCloseModal}
-                />
-                <motion.div
-                  className="modal-content fixed top-4 left-4 right-4 sm:left-auto sm:right-auto sm:w-[367px] z-50 p-6"
-                  initial={{ y: '-100%', opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: '-100%', opacity: 0 }}
-                  transition={{ duration: 0.35, ease: 'easeInOut' }}
-                >
-                  {formStep === 0 && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <h2 className="text-2xl font-bold text-gray-900 mb-4">Terms & Support</h2>
-                      <p className="text-gray-600 mb-6">
-                        This website is created with Canva, but the content is User Content subject to our{' '}
-                        <a
-                          href="https://www.canva.com/policies/terms-of-use/"
-                          target="_blank"
-                          className="text-purple-600 hover:underline"
-                        >
-                          Terms of Use
-                        </a>
-                        . If you see anything that breaches our{' '}
-                        <a
-                          href="https://www.canva.com/policies/acceptable-use-policy/"
-                          target="_blank"
-                          className="text-purple-600 hover:underline"
-                        >
-                          Acceptable Use Policy
-                        </a>
-                        , please report it.
-                      </p>
-                      <div className="flex justify-end space-x-2">
-                        <button
-                          onClick={handleCloseModal}
-                          className="px-4 py-2 bg-gray-100 text-gray-800 rounded hover:bg-gray-200"
-                        >
-                          Close
-                        </button>
-                        <button
-                          onClick={() => setFormStep(1)}
-                          className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
-                        >
-                          Report
-                        </button>
-                      </div>
-                    </motion.div>
-                  )}
-                  {formStep === 1 && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <h2 className="text-2xl font-bold text-gray-900 mb-4">Report</h2>
-                      <p className="text-gray-600 mb-2">
-                        Reporting helps ensure content is appropriate and correctly labeled.
-                      </p>
-                      <p className="text-gray-800 font-semibold mb-4">Why are you reporting this content?</p>
-                      {[
-                        { value: '0', label: 'Inappropriate content' },
-                        { value: '1', label: 'Hateful speech, activities or discrimination' },
-                        { value: '2', label: 'Illegal content' },
-                        { value: '3', label: 'Defamation or harassment' },
-                        { value: '4', label: 'Intellectual Property infringement' },
-                        { value: '5', label: 'Misinformation' },
-                        { value: '6', label: 'Phishing' },
-                        { value: '7', label: 'Something else' },
-                      ].map((option) => (
-                        <label key={option.value} className="flex items-center mb-2 cursor-pointer">
-                          <input
-                            type="radio"
-                            name="report_reason"
-                            value={option.value}
-                            checked={reportReason === option.value}
-                            onChange={(e) => setReportReason(e.target.value)}
-                            className="w-4 h-4 text-purple-600"
-                          />
-                          <span className="ml-2 text-gray-800">{option.label}</span>
-                        </label>
-                      ))}
-                      <div className="flex justify-end space-x-2 mt-6">
-                        <button
-                          onClick={handleCloseModal}
-                          className="px-4 py-2 bg-gray-100 text-gray-800 rounded hover:bg-gray-200"
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          onClick={handleNextStep}
-                          className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
-                        >
-                          Next
-                        </button>
-                      </div>
-                    </motion.div>
-                  )}
-                  {formStep === 5 && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <h2 className="text-2xl font-bold text-gray-900 mb-4">Intellectual Property Infringement</h2>
-                      <p className="text-gray-600 mb-6">
-                        Please submit an infringement notice to Canva by following the steps in our{' '}
-                        <a
-                          href="https://www.canva.com/policies/intellectual-property-policy/"
-                          target="_blank"
-                          className="text-purple-600 hover:underline"
-                        >
-                          Intellectual Property Policy
-                        </a>
-                        .
-                      </p>
-                      <div className="flex justify-end space-x-2">
-                        <button
-                          onClick={handleBack}
-                          className="px-4 py-2 bg-gray-100 text-gray-800 rounded hover:bg-gray-200"
-                        >
-                          Back
-                        </button>
-                        <button
-                          onClick={handleCloseModal}
-                          className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
-                        >
-                          Close
-                        </button>
-                      </div>
-                    </motion.div>
-                  )}
-                  {formStep === 4 && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <h2 className="text-2xl font-bold text-gray-900 mb-4">Something Else</h2>
-                      <p className="text-gray-600 mb-6">
-                        Please contact Canva at{' '}
-                        <a href="mailto:privacy@canva.com" target="_blank" className="text-purple-600 hover:underline">
-                          privacy@canva.com
-                        </a>{' '}
-                        and include the website URL to report other concerns.
-                      </p>
-                      <div className="flex justify-end space-x-2">
-                        <button
-                          onClick={handleBack}
-                          className="px-4 py-2 bg-gray-100 text-gray-800 rounded hover:bg-gray-200"
-                        >
-                          Back
-                        </button>
-                        <button
-                          onClick={handleCloseModal}
-                          className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
-                        >
-                          Close
-                        </button>
-                      </div>
-                    </motion.div>
-                  )}
-                  {formStep === 2 && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <h2 className="text-2xl font-bold text-gray-900 mb-4">Report</h2>
-                      <p className="text-gray-600 mb-4">Let's make sure you're human.</p>
-                      <form id="captcha-form" onSubmit={handleSubmit}>
-                        <div
-                          className="g-recaptcha"
-                          data-sitekey="6Ldk59waAAAAAMPqkICbJjfMivZLCGtTpa6Wn6zO"
-                          data-callback="grecaptchaCallback"
-                        ></div>
-                        <p id="error_message_captcha" className="text-red-500 text-sm mt-2 hidden">
-                          Please complete the verification.
-                        </p>
-                        <p id="error_message" className="text-red-500 text-sm mt-2 hidden">
-                          We weren't able to submit your report right now. Please try again later.
-                        </p>
-                        <div className="flex justify-end space-x-2 mt-6">
-                          <button
-                            type="button"
-                            onClick={handleBack}
-                            className="px-4 py-2 bg-gray-100 text-gray-800 rounded hover:bg-gray-200"
-                          >
-                            Back
-                          </button>
-                          <button
-                            type="submit"
-                            className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
-                          >
-                            Submit
-                          </button>
-                        </div>
-                      </form>
-                    </motion.div>
-                  )}
-                  {formStep === 3 && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <h2 className="text-2xl font-bold text-gray-900 mb-4">Thank You</h2>
-                      <p className="text-gray-600 mb-6">
-                        Thanks for flagging this content. Our team will review it as soon as possible.
-                      </p>
-                      <div className="flex justify-end">
-                        <button
-                          onClick={handleCloseModal}
-                          className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
-                        >
-                          Close
-                        </button>
-                      </div>
-                    </motion.div>
-                  )}
-                </motion.div>
-              </>
-            )}
-          </AnimatePresence>
-        </div>
-      );
-    };
-
-    ReactDOM.render(<App />, document.getElementById('root'));
+      console.log('Initialization complete.');
+    });
   </script>
 </body>
 </html>
