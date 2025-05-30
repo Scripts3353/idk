@@ -1,99 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Virus Simulator</title>
+  <meta charset="UTF-8" />
+  <title>Windows Desktop</title>
   <style>
     body {
-      background-color: #000;
       margin: 0;
-      font-family: monospace;
-      color: #0f0;
+      background: url('https://wallpapercave.com/wp/wp2555010.jpg') no-repeat center center fixed;
+      background-size: cover;
+      font-family: 'Segoe UI', sans-serif;
+      height: 100vh;
       overflow: hidden;
     }
-    #popup {
-      position: absolute;
-      top: 10%;
-      left: 10%;
-      width: 80%;
-      height: 80%;
-      background: #111;
-      border: 2px solid red;
-      box-shadow: 0 0 20px red;
-      padding: 10px;
-      overflow: auto;
-      display: none;
-    }
-    .task-manager, .fake-browser {
+
+    .desktop-icon {
       position: absolute;
       top: 50px;
       left: 50px;
-      width: 600px;
-      height: 400px;
-      background-color: #1e1e1e;
-      color: #0f0;
-      border: 2px solid lime;
-      display: none;
-      padding: 10px;
-      box-shadow: 0 0 15px lime;
-    }
-    button {
-      background: red;
-      color: white;
-      border: none;
-      padding: 8px 12px;
-      margin: 5px;
+      width: 80px;
+      text-align: center;
       cursor: pointer;
+      color: white;
     }
-    .toolbar {
-      background: #333;
-      padding: 5px;
+
+    .desktop-icon img {
+      width: 48px;
+      height: 48px;
+    }
+
+    .window {
+      display: none;
+      position: absolute;
+      top: 60px;
+      left: 100px;
+      width: 700px;
+      height: 400px;
+      background-color: black;
+      color: lime;
+      font-family: monospace;
+      padding: 10px;
+      box-shadow: 0 0 10px lime;
+      overflow: auto;
+      z-index: 10;
+    }
+
+    .taskbar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 40px;
+      background-color: rgba(0, 0, 0, 0.6);
+      color: white;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+    }
+
+    .start-button {
+      background-color: #0078d7;
+      border: none;
+      padding: 5px 10px;
+      color: white;
+      font-weight: bold;
+      margin-right: 10px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
 
-<div class="toolbar">
-  <button onclick="showTaskManager()">Open Task Manager</button>
-  <button onclick="showFakeBrowser()">Open Browser</button>
-  <button onclick="showPopup()">Show Virus Message</button>
+<!-- Desktop Icon -->
+<div class="desktop-icon" onclick="startVirus()">
+  <img src="https://icons.iconarchive.com/icons/dakirby309/windows-8-metro/256/Folders-OS-Hacking-Metro-icon.png" alt="Hacking">
+  <div>secret.exe</div>
 </div>
 
-<div class="task-manager" id="taskManager">
-  <h3>Task Manager</h3>
-  <p>process.exe — CPU 97%</p>
-  <p>explorer.exe — CPU 2%</p>
-  <p>notavirus.exe — CPU 101%</p>
-  <button onclick="closeWindow('taskManager')">Close</button>
+<!-- Fake Terminal Window -->
+<div class="window" id="virusWindow">
+  <h3>System Breach Simulation</h3>
+  <pre id="terminalOutput">Initializing hack...\n</pre>
 </div>
 
-<div class="fake-browser" id="fakeBrowser">
-  <h3>Internet Exploder</h3>
-  <p>🔒 Connection Not Secure</p>
-  <p>Welcome to totallylegitsite.ru</p>
-  <marquee behavior="scroll" direction="left">💀 YOUR COMPUTER IS INFECTED 💀</marquee>
-  <button onclick="closeWindow('fakeBrowser')">Close</button>
-</div>
-
-<div id="popup">
-  <h2>⚠️ SYSTEM WARNING ⚠️</h2>
-  <p>Critical error: 0x000000DEAD — Please restart your computer immediately.</p>
-  <p>System is being compromised.</p>
-  <button onclick="document.getElementById('popup').style.display='none'">Dismiss</button>
+<!-- Fake Taskbar -->
+<div class="taskbar">
+  <button class="start-button">Start</button>
+  <div style="margin-left: 10px;">Virus Simulator</div>
 </div>
 
 <script>
-  function showTaskManager() {
-    document.getElementById("taskManager").style.display = "block";
-  }
-  function showFakeBrowser() {
-    document.getElementById("fakeBrowser").style.display = "block";
-  }
-  function showPopup() {
-    document.getElementById("popup").style.display = "block";
-  }
-  function closeWindow(id) {
-    document.getElementById(id).style.display = "none";
+  let output = document.getElementById('terminalOutput');
+  let lines = [
+    "[*] Connecting to remote server...",
+    "[*] Bypassing firewall...",
+    "[*] Uploading payload...",
+    "[*] Executing payload...",
+    "[*] Accessing system32...",
+    "[*] Deleting shadow copies...",
+    "[*] Mining crypto...",
+    "[*] Uploading browsing history...",
+    "[*] Exfiltrating files...",
+    "[*] Complete. System compromised."
+  ];
+
+  function startVirus() {
+    document.getElementById('virusWindow').style.display = 'block';
+    let index = 0;
+    let interval = setInterval(() => {
+      if (index < lines.length) {
+        output.textContent += lines[index] + '\n';
+        output.scrollTop = output.scrollHeight;
+        index++;
+      } else {
+        clearInterval(interval);
+      }
+    }, 800);
   }
 </script>
 
