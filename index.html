@@ -2,101 +2,100 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>PC Virus Simulator</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Virus Simulator</title>
   <style>
     body {
-      background: black;
-      color: lime;
+      background-color: #000;
+      margin: 0;
       font-family: monospace;
+      color: #0f0;
       overflow: hidden;
     }
-
-    .popup {
+    #popup {
       position: absolute;
-      width: 300px;
-      height: 150px;
+      top: 10%;
+      left: 10%;
+      width: 80%;
+      height: 80%;
+      background: #111;
+      border: 2px solid red;
+      box-shadow: 0 0 20px red;
+      padding: 10px;
+      overflow: auto;
+      display: none;
+    }
+    .task-manager, .fake-browser {
+      position: absolute;
+      top: 50px;
+      left: 50px;
+      width: 600px;
+      height: 400px;
+      background-color: #1e1e1e;
+      color: #0f0;
+      border: 2px solid lime;
+      display: none;
+      padding: 10px;
+      box-shadow: 0 0 15px lime;
+    }
+    button {
       background: red;
       color: white;
-      padding: 10px;
-      border: 3px solid white;
-      box-shadow: 0 0 10px white;
-      animation: flicker 0.3s infinite;
+      border: none;
+      padding: 8px 12px;
+      margin: 5px;
+      cursor: pointer;
     }
-
-    @keyframes flicker {
-      0% { opacity: 1; }
-      50% { opacity: 0.8; }
-      100% { opacity: 1; }
-    }
-
-    .terminal {
-      white-space: pre-wrap;
-      padding: 20px;
-      font-size: 16px;
-    }
-
-    .glitch {
-      animation: glitch 0.3s infinite;
-    }
-
-    @keyframes glitch {
-      0% { transform: translate(0, 0); }
-      25% { transform: translate(-2px, 2px); }
-      50% { transform: translate(2px, -1px); }
-      75% { transform: translate(-1px, -1px); }
-      100% { transform: translate(0, 0); }
+    .toolbar {
+      background: #333;
+      padding: 5px;
     }
   </style>
 </head>
-<body onclick="startVirus()">
+<body>
 
-  <div id="terminal" class="terminal">
-    CLICK TO START SIMULATION...
-  </div>
+<div class="toolbar">
+  <button onclick="showTaskManager()">Open Task Manager</button>
+  <button onclick="showFakeBrowser()">Open Browser</button>
+  <button onclick="showPopup()">Show Virus Message</button>
+</div>
 
-  <script>
-    const terminal = document.getElementById('terminal');
+<div class="task-manager" id="taskManager">
+  <h3>Task Manager</h3>
+  <p>process.exe — CPU 97%</p>
+  <p>explorer.exe — CPU 2%</p>
+  <p>notavirus.exe — CPU 101%</p>
+  <button onclick="closeWindow('taskManager')">Close</button>
+</div>
 
-    function getRandomMessage() {
-      const messages = [
-        "Scanning system32\\virus.exe...",
-        "Encrypting files...",
-        "Uploading user data to hacker cloud...",
-        "System compromised!",
-        "Injecting malware...",
-        "Establishing backdoor...",
-        "Bitcoin miner installed.",
-        "Deleting registry...",
-        "Access granted. 🛑",
-        "Initiating critical failure.",
-        "FBI WARNING: Illegal Activity Detected."
-      ];
-      return messages[Math.floor(Math.random() * messages.length)];
-    }
+<div class="fake-browser" id="fakeBrowser">
+  <h3>Internet Exploder</h3>
+  <p>🔒 Connection Not Secure</p>
+  <p>Welcome to totallylegitsite.ru</p>
+  <marquee behavior="scroll" direction="left">💀 YOUR COMPUTER IS INFECTED 💀</marquee>
+  <button onclick="closeWindow('fakeBrowser')">Close</button>
+</div>
 
-    function startVirus() {
-      terminal.innerText = "VIRUS SIMULATION ACTIVE...\n\n";
-      document.body.classList.add('glitch');
-      setInterval(() => {
-        terminal.innerText += getRandomMessage() + "\n";
-        terminal.scrollTop = terminal.scrollHeight;
-        spawnPopup();
-      }, 800);
-    }
+<div id="popup">
+  <h2>⚠️ SYSTEM WARNING ⚠️</h2>
+  <p>Critical error: 0x000000DEAD — Please restart your computer immediately.</p>
+  <p>System is being compromised.</p>
+  <button onclick="document.getElementById('popup').style.display='none'">Dismiss</button>
+</div>
 
-    function spawnPopup() {
-      const popup = document.createElement('div');
-      popup.className = 'popup';
-      popup.style.top = `${Math.random() * window.innerHeight}px`;
-      popup.style.left = `${Math.random() * window.innerWidth}px`;
-      popup.innerHTML = `
-        <strong>⚠️ CRITICAL ERROR</strong><br>
-        Trojan.Win32.Bitminer Detected<br>
-        <button onclick="this.parentElement.remove()">Close</button>
-      `;
-      document.body.appendChild(popup);
-    }
-  </script>
+<script>
+  function showTaskManager() {
+    document.getElementById("taskManager").style.display = "block";
+  }
+  function showFakeBrowser() {
+    document.getElementById("fakeBrowser").style.display = "block";
+  }
+  function showPopup() {
+    document.getElementById("popup").style.display = "block";
+  }
+  function closeWindow(id) {
+    document.getElementById(id).style.display = "none";
+  }
+</script>
+
 </body>
 </html>
