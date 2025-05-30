@@ -28,7 +28,19 @@
       height: 48px;
     }
 
-    .window {
+    .popup {
+      position: absolute;
+      background: white;
+      border: 3px solid red;
+      color: black;
+      padding: 20px;
+      box-shadow: 0 0 10px red;
+      font-weight: bold;
+      z-index: 999;
+      width: 200px;
+    }
+
+    .terminal {
       display: none;
       position: absolute;
       top: 60px;
@@ -77,7 +89,7 @@
 </div>
 
 <!-- Fake Terminal Window -->
-<div class="window" id="virusWindow">
+<div class="terminal" id="virusWindow">
   <h3>System Breach Simulation</h3>
   <pre id="terminalOutput">Initializing hack...\n</pre>
 </div>
@@ -88,33 +100,62 @@
   <div style="margin-left: 10px;">Virus Simulator</div>
 </div>
 
+<!-- BEEP -->
+<audio id="beep" src="https://www.soundjay.com/button/beep-07.wav"></audio>
+
 <script>
   let output = document.getElementById('terminalOutput');
+  let beep = document.getElementById('beep');
   let lines = [
-    "[*] Connecting to remote server...",
-    "[*] Bypassing firewall...",
-    "[*] Uploading payload...",
-    "[*] Executing payload...",
-    "[*] Accessing system32...",
-    "[*] Deleting shadow copies...",
-    "[*] Mining crypto...",
-    "[*] Uploading browsing history...",
-    "[*] Exfiltrating files...",
-    "[*] Complete. System compromised."
+    "[*] Connecting to command and control...",
+    "[*] Disabling antivirus...",
+    "[*] Scanning local drives...",
+    "[*] Exfiltrating passwords...",
+    "[*] Sending data to remote host...",
+    "[*] Injecting payload...",
+    "[*] Activating self-replicating worm...",
+    "[*] Uploading webcam footage...",
+    "[*] IP address found: 213.133.45.221",
+    "[*] Launch complete. System compromised."
   ];
+
+  function createPopup(message) {
+    let popup = document.createElement('div');
+    popup.className = 'popup';
+    popup.innerText = message;
+    popup.style.top = Math.random() * (window.innerHeight - 100) + "px";
+    popup.style.left = Math.random() * (window.innerWidth - 200) + "px";
+    document.body.appendChild(popup);
+    beep.play();
+    setTimeout(() => popup.remove(), 5000);
+  }
 
   function startVirus() {
     document.getElementById('virusWindow').style.display = 'block';
     let index = 0;
+
     let interval = setInterval(() => {
       if (index < lines.length) {
         output.textContent += lines[index] + '\n';
         output.scrollTop = output.scrollHeight;
+
+        // Create popups at every 2nd message
+        if (index % 2 === 0) {
+          createPopup("⚠️ WARNING: SYSTEM INTRUSION DETECTED");
+        }
+
+        if (index === lines.length - 1) {
+          setTimeout(() => {
+            alert("YOUR IP HAS BEEN EXPOSED: 213.133.45.221");
+            createPopup("💀 FATAL ERROR: SYSTEM LOCKED");
+          }, 1000);
+        }
+
         index++;
       } else {
         clearInterval(interval);
       }
-    }, 800);
+    }, 1000);
   }
 </script>
 
