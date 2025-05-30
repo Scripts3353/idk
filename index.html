@@ -1,238 +1,82 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Animal Company JSON Maker</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-      background: linear-gradient(135deg, #1e40af, #7c3aed);
-      min-height: 100vh;
-      margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow-x: hidden;
-      color: white;
-    }
-    .gradient-text {
-      background: linear-gradient(90deg, #22d3ee, #ec4899);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .glow-button {
-      position: relative;
-      overflow: hidden;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .glow-button:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
-    }
-    .glow-button::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
-      transition: left 0.6s ease;
-    }
-    .glow-button:hover::after {
-      left: 100%;
-    }
-    .modal {
-      display: none;
-      position: fixed;
-      top: 1rem;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 90%;
-      max-width: 400px;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-      padding: 2rem;
-      z-index: 1000;
-    }
-    .modal.active {
-      display: block;
-    }
-    .modal-backdrop {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(4px);
-      z-index: 999;
-    }
-    .modal-backdrop.active {
-      display: block;
-    }
-    @media (max-width: 640px) {
-      .modal {
-        top: auto;
-        bottom: 0;
-        left: 0;
-        transform: none;
-        width: 100%;
-        border-radius: 16px 16px 0 0;
+<html lang="en"><head>
+    <style data-vite-theme="" data-inject-first="">:root {
+      --background: 217 30% 9%;
+--foreground: 217 100% 90%;
+--muted: 217 62% 21%;
+--muted-foreground: 217 100% 90%;
+--popover: 217 30% 9%;
+--popover-foreground: 217 100% 90%;
+--card: 217 30% 9%;
+--card-foreground: 217 100% 90%;
+--border: 217 62% 21%;
+--input: 217 62% 21%;
+--primary: 217 100% 69%;
+--primary-foreground: 217 100% 99%;
+--secondary: 217 62% 21%;
+--secondary-foreground: 217 100% 90%;
+--accent: 217 62% 21%;
+--accent-foreground: 217 100% 90%;
+--destructive: 0 62.8% 30.6%;
+--destructive-foreground: 0 0% 98%;
+--ring: 217 100% 69%;
+--radius: 0.5rem;
+  }
+  .light {
+      --background: 217 100% 98%;
+--foreground: 242 100% 6%;
+--muted: 217 100% 90%;
+--muted-foreground: 242 100% 6%;
+--popover: 217 100% 98%;
+--popover-foreground: 242 100% 6%;
+--card: 217 100% 98%;
+--card-foreground: 242 100% 6%;
+--border: 217 100% 90%;
+--input: 217 100% 90%;
+--primary: 216 85% 43%;
+--primary-foreground: 217 75% 98%;
+--secondary: 217 100% 95%;
+--secondary-foreground: 242 100% 6%;
+--accent: 217 100% 95%;
+--accent-foreground: 242 100% 6%;
+--destructive: 0 84.2% 60.2%;
+--destructive-foreground: 60 9.1% 97.8%;
+--ring: 216 85% 43%;
+--radius: 0.5rem;
+  }</style>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <title>Animal Company JSON Generator</title>
+    
+    <!-- Load Do Hyeon font locally - ONLY used for STASH title -->
+    <link rel="stylesheet" href="/fonts/dohyeon-font.css">
+    <link rel="preload" href="/fonts/DoHyeon-Regular.ttf" as="font" type="font/ttf" crossorigin="">
+    <style>
+      /* Force the STASH title to use Do Hyeon font */
+      @font-face {
+        font-family: 'Do Hyeon';
+        font-style: normal;
+        font-weight: 400;
+        src: url('/fonts/DoHyeon-Regular.ttf') format('truetype');
+        font-display: swap;
       }
-    }
-    .content-container {
-      opacity: 0;
-    }
-    .footer-container {
-      opacity: 0;
-    }
-  </style>
-</head>
-<body>
-  <div class="content-container flex flex-col items-center justify-center min-h-screen px-4">
-    <div class="bg-white bg-opacity-10 rounded-3xl p-8 sm:p-12 max-w-lg w-full text-center shadow-2xl">
-      <h1 class="text-3xl sm:text-5xl font-bold gradient-text mb-8">Animal Company JSON Maker</h1>
-      <a
-        href="https://ac-json-maker.created.app"
-        target="_blank"
-        rel="noopener nofollow"
-        class="glow-button block bg-gradient-to-r from-cyan-400 to-blue-500 text-white font-semibold py-3 px-6 rounded-full mb-4 w-full text-lg"
-      >
-        Create JSON Now
-      </a>
-      <a
-        href="https://discord.gg/m4wXr4rEE8"
-        target="_blank"
-        rel="noopener nofollow"
-        class="glow-button block bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold py-3 px-6 rounded-full w-full text-lg"
-      >
-        Join Our Discord
-      </a>
-    </div>
-    <div class="footer-container mt-8 flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
-      <button
-        id="report-button"
-        class="glow-button bg-white bg-opacity-10 text-white font-semibold py-2 px-6 rounded-full hover:bg-opacity-20"
-      >
-        Terms & Support
-      </button>
-      <a
-        href="https://www.canva.com"
-        target="_blank"
-        rel="noopener"
-        class="glow-button bg-white bg-opacity-20 text-white font-semibold py-2 px-6 rounded-full hover:bg-opacity-30 flex items-center justify-center"
-      >
-        Designed with Canva
-        <svg class="ml-2 h-5" viewBox="0 0 80 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path
-            d="M79.444 18.096c-.136 0-.26.088-.324.272-.82 2.34-1.928 3.732-2.84 3.732-.524 0-.736-.584-.736-1.5 0-2.292 1.372-7.152 2.064-9.368.08-.268.132-.508.132-.712 0-.644-.352-.96-1.224-.96-.94 0-1.952.368-2.936 2.092-.34-1.52-1.368-2.184-2.804-2.184-1.66 0-3.264 1.068-4.584 2.8-1.32 1.732-2.872 2.3-4.04 2.02.84-2.056 1.152-3.592 1.152-4.732 0-1.788-.884-2.868-2.312-2.868-2.172 0-3.424 2.072-3.424 4.252 0 1.684.764 3.416 2.444 4.256-1.408 3.184-3.464 6.064-4.244 6.064-1.008 0-1.304-4.932-1.248-8.46.036-2.024.204-2.128.204-2.74 0-.352-.228-.592-1.144-.592-2.136 0-2.796 1.808-2.896 3.884a10.233 10.233 0 01-.368 2.332c-.892 3.184-2.732 5.6-3.932 5.6-.556 0-.708-.556-.708-1.284 0-2.292 1.284-5.156 1.284-7.6 0-1.796-.788-2.932-2.272-2.932-1.748 0-4.06 2.08-6.248 5.976.72-2.984 1.016-5.872-1.116-5.872A2.886 2.886 0 0036 9.916a.752.752 0 00-.432.728c.204 3.176-2.56 11.312-5.18 11.312-.476 0-.708-.516-.708-1.348 0-2.296 1.368-7.144 2.056-9.364.088-.288.136-.536.136-.752 0-.608-.376-.92-1.228-.92-.936 0-1.952.356-2.932 2.08-.344-1.52-1.372-2.184-2.808-2.184-2.356 0-4.988 2.492-6.144 5.74-1.548 4.336-4.668 8.524-8.868 8.524-3.812 0-5.824-3.172-5.824-8.184C4.068 8.312 9.38 2.4 13.32 2.4c1.884 0 2.784 1.2 2.784 3.04 0 2.228-1.244 3.264-1.244 4.112 0 .26.216.516.644.516 1.712 0 3.728-2.012 3.728-4.756S17.004.56 13.064.56C6.552.56 0 7.112 0 15.508c0 6.68 3.296 10.708 8.996 10.708 3.888 0 7.284-3.024 9.116-6.552.208 2.924 1.536 4.452 3.56 4.452 1.8 0 3.256-1.072 4.368-2.956.428 1.972 1.564 2.936 3.04 2.936 1.692 0 3.108-1.072 4.456-3.064-.02 1.564.336 3.036 1.692 3.036.64 0 1.404-.148 1.54-.708 1.428-5.904 4.956-10.724 6.036-10.724.32 0 .408.308.408.672 0 1.604-1.132 4.892-1.132 6.992 0 2.268.964 3.768 2.956 3.768 2.208 0 4.452-2.704 5.948-6.656.468 3.692 1.48 6.672 3.064 6.672 1.944 0 5.396-4.092 7.488-8.424.82.104 2.052.076 3.236-.76-.504 1.276-.8 2.672-.8 4.068 0 4.02 1.92 5.148 3.572 5.148 1.796 0 3.252-1.072 4.368-2.956.368 1.7 1.308 2.932 3.036 2.932 2.704 0 5.052-2.764 5.052-5.032 0-.6-.256-.964-.556-.964z"
-            fill="#fff"
-          />
-        </svg>
-      </a>
-    </div>
-  </div>
-  <div id="modal-backdrop" class="modal-backdrop"></div>
-  <div id="modal" class="modal">
-    <div id="form-step-terms" class="form-content">
-      <h2 class="text-2xl font-bold text-gray-900 mb-4">Terms & Support</h2>
-      <p class="text-gray-600 mb-6 text-sm">
-        This website is created with Canva, subject to our
-        <a href="https://www.canva.com/policies/terms-of-use/" target="_blank" rel="noopener" class="text-purple-600 hover:underline"> Terms of Use</a>.
-        Report any content that violates our
-        <a href="https://www.canva.com/policies/acceptable-use-policy/" target="_blank" rel="noopener" class="text-purple-600 hover:underline"> Acceptable Use Policy</a>.
-      </p>
-      <div class="flex justify-end space-x-3">
-        <button id="close-modal" class="px-4 py-2 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200">Close</button>
-        <button id="report-next" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">Report</button>
-      </div>
-    </div>
-  </div>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      console.log('Page loaded, initializing animations and event listeners...');
-
-      // GSAP Animations
-      gsap.from('.content-container', {
-        opacity: 0,
-        y: 100,
-        duration: 1,
-        ease: 'power3.out'
-      });
-      gsap.from('.footer-container', {
-        opacity: 0,
-        y: 50,
-        duration: 1,
-        delay: 0.3,
-        ease: 'power3.out'
-      });
-      gsap.from('h1', {
-        scale: 0.8,
-        opacity: 0,
-        duration: 0.8,
-        delay: 0.2,
-        ease: 'back.out(1.7)'
-      });
-      gsap.from('.glow-button', {
-        opacity: 0,
-        y: 20,
-        duration: 0.6,
-        stagger: 0.2,
-        delay: 0.5,
-        ease: 'power2.out'
-      });
-
-      // Modal Logic
-      const modal = document.getElementById('modal');
-      const backdrop = document.getElementById('modal-backdrop');
-      const reportButton = document.getElementById('report-button');
-      const closeModalButton = document.getElementById('close-modal');
-      const reportNextButton = document.getElementById('report-next');
-
-      const openModal = () => {
-        console.log('Opening modal...');
-        modal.classList.add('active');
-        backdrop.classList.add('active');
-        gsap.fromTo(modal, 
-          { y: '100%', opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.4, ease: 'power2.out' }
-        );
-      };
-
-      const closeModal = () => {
-        console.log('Closing modal...');
-        gsap.to(modal, {
-          y: '100%',
-          opacity: 0,
-          duration: 0.4,
-          ease: 'power2.in',
-          onComplete: () => {
-            modal.classList.remove('active');
-            backdrop.classList.remove('active');
-          }
-        });
-      };
-
-      reportButton.addEventListener('click', openModal);
-      closeModalButton.addEventListener('click', closeModal);
-      backdrop.addEventListener('click', closeModal);
-      reportNextButton.addEventListener('click', () => {
-        alert('Report functionality requires additional setup. Please contact support at privacy@canva.com.');
-      });
-
-      // Prevent right-click on images (if any)
-      document.addEventListener('contextmenu', (e) => {
-        if (['IMG', 'VIDEO', 'SVG', 'PICTURE'].includes(e.target.tagName.toUpperCase())) {
-          e.preventDefault();
-        }
-      });
-
-      console.log('Initialization complete.');
-    });
-  </script>
-</body>
-</html>
+      
+      #stash-title {
+        font-family: 'Do Hyeon', sans-serif !important;
+      }
+    </style>
+    
+    <meta name="theme-color" content="#8a7fe1">
+    <meta property="og:title" content="Create .json's easier.">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Animal Company JSON Generator">
+    <meta property="og:image" content="https://i.ibb.co/4xbnykF/download.png">
+    <script type="module" crossorigin="" src="/assets/index-DHdCfPE8.js"></script>
+    <link rel="stylesheet" crossorigin="" href="/assets/index-CebTy8rM.css">
+  </head>
+  <body>
+    <div id="root"><div class="min-h-screen bg-background"><nav class="border-b"><div class="container flex h-14 max-w-screen-2xl items-center"><div class="flex-1 flex items-center space-x-4 lg:space-x-6"><a href="/"><div class="font-bold text-lg cursor-pointer">AC JSON MAKER</div></a><a href="/generator"><div class="text-muted-foreground hover:text-foreground transition-colors cursor-pointer">AI Generator</div></a><a href="/shared"><div class="text-muted-foreground hover:text-foreground transition-colors cursor-pointer">More JSON</div></a><a href="/blocks"><div class="text-muted-foreground hover:text-foreground transition-colors cursor-pointer">Block Builder</div></a><a href="/news"><div class="text-muted-foreground hover:text-foreground transition-colors cursor-pointer">News &amp; Updates</div></a><a href="/help"><div class="text-muted-foreground hover:text-foreground transition-colors cursor-pointer">Help</div></a><a href="/leaderboard"><div class="text-muted-foreground hover:text-foreground transition-colors cursor-pointer">Leaderboard</div></a><a href="/test"><div class="text-muted-foreground hover:text-foreground transition-colors cursor-pointer">Stash</div></a></div><div class="flex items-center"><span class="relative flex shrink-0 overflow-hidden rounded-full h-9 w-9 cursor-pointer" type="button" id="radix-:r0:" aria-haspopup="menu" aria-expanded="false" data-state="closed"><img class="aspect-square h-full w-full" alt="lm_ac" src="https://cdn.discordapp.com/avatars/1204549082824310847/a_133e336a7e1b861ea7818f8ed05a33ba.png?size=64"></span></div></div></nav><main><div class="container mx-auto px-4 py-8 max-w-3xl"><header class="mb-8 text-center"><h1 class="text-3xl md:text-4xl font-bold text-white mb-3">AI JSON Generator</h1><p class="text-gray-400">Generate custom JSON configurations for Animal Company items using AI</p></header><main><div class="text-card-foreground bg-gray-800 rounded-lg shadow-md p-2 mb-8 border border-gray-700"><div class="p-6 pt-6"><label for="userInput" class="block text-lg font-medium mb-2 text-white">What would you like your JSON to have?</label><p class="text-sm text-gray-300 mb-4">For example: "a red colored shotgun with 100 ammo" or "a large backpack containing a flashlight"</p><textarea class="flex min-h-[80px] text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-full p-3 border border-gray-600 bg-gray-700 text-white rounded-md mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium" id="userInput" placeholder="Describe what you want your JSON to include..." rows="3"></textarea><div role="alert" class="relative w-full rounded-lg border p-4 [&amp;>svg~*]:pl-7 [&amp;>svg+div]:translate-y-[-3px] [&amp;>svg]:absolute [&amp;>svg]:left-4 [&amp;>svg]:top-4 [&amp;>svg]:text-foreground mb-4 bg-gray-700 border-amber-600 text-amber-200"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-alert h-4 w-4"><circle cx="12" cy="12" r="10"></circle><line x1="12" x2="12" y1="8" y2="12"></line><line x1="12" x2="12.01" y1="16" y2="16"></line></svg><h5 class="mb-1 font-medium leading-none tracking-tight">Important</h5><div class="[&amp;_p]:leading-relaxed text-sm text-gray-200">Your input must use the correct item names. For example, the suitcase is actually named "pelican case" in the system.</div></div><div role="alert" class="relative w-full rounded-lg border p-4 [&amp;>svg~*]:pl-7 [&amp;>svg+div]:translate-y-[-3px] [&amp;>svg]:absolute [&amp;>svg]:left-4 [&amp;>svg]:top-4 [&amp;>svg]:text-foreground mb-4 bg-gray-700 border-orange-600 text-orange-200"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-triangle-alert h-4 w-4"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg><h5 class="mb-1 font-medium leading-none tracking-tight">AI Accuracy Warning</h5><div class="[&amp;_p]:leading-relaxed text-sm text-gray-200">The AI won't always be completely accurate. There will still be errors here and there in the generated JSON. Always review the output carefully.</div></div><button class="gap-2 whitespace-nowrap text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-10 w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-md transition duration-200 flex justify-center items-center" disabled=""><span class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sparkles h-5 w-5 mr-2"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path><path d="M20 3v4"></path><path d="M22 5h-4"></path><path d="M4 17v2"></path><path d="M5 18H3"></path></svg>Generate JSON with AI</span></button></div></div><div class="mt-12 mb-8"><h2 class="text-xl font-bold mb-6 text-white flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sparkles h-5 w-5 mr-2 text-amber-500"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path><path d="M20 3v4"></path><path d="M22 5h-4"></path><path d="M4 17v2"></path><path d="M5 18H3"></path></svg>Example Configurations</h2><div dir="ltr" data-orientation="horizontal"><div role="tablist" aria-orientation="horizontal" class="inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground mb-4" tabindex="0" data-orientation="horizontal" style="outline: none;"><button type="button" role="tab" aria-selected="true" aria-controls="radix-:r2:-content-weapons" data-state="active" id="radix-:r2:-trigger-weapons" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm" tabindex="-1" data-orientation="horizontal" data-radix-collection-item="">Weapons</button><button type="button" role="tab" aria-selected="false" aria-controls="radix-:r2:-content-colors" data-state="inactive" id="radix-:r2:-trigger-colors" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm" tabindex="-1" data-orientation="horizontal" data-radix-collection-item="">Colors</button><button type="button" role="tab" aria-selected="false" aria-controls="radix-:r2:-content-shredder" data-state="inactive" id="radix-:r2:-trigger-shredder" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm" tabindex="-1" data-orientation="horizontal" data-radix-collection-item="">Shredder</button><button type="button" role="tab" aria-selected="false" aria-controls="radix-:r2:-content-backpacks" data-state="inactive" id="radix-:r2:-trigger-backpacks" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm" tabindex="-1" data-orientation="horizontal" data-radix-collection-item="">Backpacks</button><button type="button" role="tab" aria-selected="false" aria-controls="radix-:r2:-content-sizes" data-state="inactive" id="radix-:r2:-trigger-sizes" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm" tabindex="-1" data-orientation="horizontal" data-radix-collection-item="">Sizes</button></div><div data-state="active" data-orientation="horizontal" role="tabpanel" aria-labelledby="radix-:r2:-trigger-weapons" id="radix-:r2:-content-weapons" tabindex="0" class="mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" style="animation-duration: 0s;"><div class="rounded-lg border text-card-foreground shadow-sm mb-4 overflow-hidden bg-gray-800 border-gray-700"><div class="flex flex-col space-y-1.5 p-6 bg-gray-700 pb-3"><h3 class="tracking-tight text-md font-medium flex items-center justify-between text-white">Basic Weapon Example<button class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 hover:bg-accent rounded-md text-blue-400 p-0 h-auto font-normal hover:text-blue-300">Use this example<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link h-3 w-3 ml-1"><path d="M15 3h6v6"></path><path d="M10 14 21 3"></path><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path></svg></button></h3><p class="text-sm text-gray-300 italic">"I want a shotgun with 5 bullets"</p></div><div class="p-6 pt-4"><div class="rounded-lg border text-card-foreground shadow-sm bg-gray-800 border-gray-700"><div class="flex-col space-y-1.5 p-6 pb-2 flex justify-between items-center"><h3 class="tracking-tight text-sm font-medium text-white">Generated JSON</h3><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 border rounded-md h-8 px-2 text-xs bg-gray-700 text-white border-gray-600 hover:bg-gray-600"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy h-3.5 w-3.5 mr-1"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>Copy JSON</button></div><div class="p-6 pt-0"><div class="font-mono text-sm overflow-auto text-white"><div style="margin-left: 0px;"><span>{</span><div><div class="flex"><span class="text-emerald-400 mr-1">"itemID":</span><span class="text-amber-400">"item_shotgun"</span><span>,</span></div><div class="flex"><span class="text-emerald-400 mr-1">"ammo":</span><span class="text-blue-400">5</span></div></div><span>}</span></div></div></div></div></div></div><div class="rounded-lg border text-card-foreground shadow-sm mb-4 overflow-hidden bg-gray-800 border-gray-700"><div class="flex flex-col space-y-1.5 p-6 bg-gray-700 pb-3"><h3 class="tracking-tight text-md font-medium flex items-center justify-between text-white">Flare Gun Example<button class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 hover:bg-accent rounded-md text-blue-400 p-0 h-auto font-normal hover:text-blue-300">Use this example<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link h-3 w-3 ml-1"><path d="M15 3h6v6"></path><path d="M10 14 21 3"></path><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path></svg></button></h3><p class="text-sm text-gray-300 italic">"Give me a flare gun with 3 ammo"</p></div><div class="p-6 pt-4"><div class="rounded-lg border text-card-foreground shadow-sm bg-gray-800 border-gray-700"><div class="flex-col space-y-1.5 p-6 pb-2 flex justify-between items-center"><h3 class="tracking-tight text-sm font-medium text-white">Generated JSON</h3><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 border rounded-md h-8 px-2 text-xs bg-gray-700 text-white border-gray-600 hover:bg-gray-600"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy h-3.5 w-3.5 mr-1"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>Copy JSON</button></div><div class="p-6 pt-0"><div class="font-mono text-sm overflow-auto text-white"><div style="margin-left: 0px;"><span>{</span><div><div class="flex"><span class="text-emerald-400 mr-1">"itemID":</span><span class="text-amber-400">"item_flaregun"</span><span>,</span></div><div class="flex"><span class="text-emerald-400 mr-1">"ammo":</span><span class="text-blue-400">3</span></div></div><span>}</span></div></div></div></div></div></div></div><div data-state="inactive" data-orientation="horizontal" role="tabpanel" aria-labelledby="radix-:r2:-trigger-colors" hidden="" id="radix-:r2:-content-colors" tabindex="0" class="mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"></div><div data-state="inactive" data-orientation="horizontal" role="tabpanel" aria-labelledby="radix-:r2:-trigger-shredder" hidden="" id="radix-:r2:-content-shredder" tabindex="0" class="mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"></div><div data-state="inactive" data-orientation="horizontal" role="tabpanel" aria-labelledby="radix-:r2:-trigger-backpacks" hidden="" id="radix-:r2:-content-backpacks" tabindex="0" class="mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"></div><div data-state="inactive" data-orientation="horizontal" role="tabpanel" aria-labelledby="radix-:r2:-trigger-sizes" hidden="" id="radix-:r2:-content-sizes" tabindex="0" class="mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"></div></div></div></main></div></main></div><div role="region" aria-label="Notifications (F8)" tabindex="-1" style="pointer-events: none;"><ol tabindex="-1" class="fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]"></ol></div><div role="region" aria-label="Notifications (F8)" tabindex="-1" style="pointer-events: none;"><ol tabindex="-1" class="fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]"></ol></div></div>
+    <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
+    <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
+  
+</body></html>
