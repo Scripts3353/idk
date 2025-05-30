@@ -1,119 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Virus Simulator</title>
+  <meta charset="UTF-8">
+  <title>PC Virus Simulator</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    canvas {
-      border: 1px solid #ccc;
-      background-color: #111;
-      display: block;
-      margin: 0 auto;
+    body {
+      background: black;
+      color: lime;
+      font-family: monospace;
+      overflow: hidden;
+    }
+
+    .popup {
+      position: absolute;
+      width: 300px;
+      height: 150px;
+      background: red;
+      color: white;
+      padding: 10px;
+      border: 3px solid white;
+      box-shadow: 0 0 10px white;
+      animation: flicker 0.3s infinite;
+    }
+
+    @keyframes flicker {
+      0% { opacity: 1; }
+      50% { opacity: 0.8; }
+      100% { opacity: 1; }
+    }
+
+    .terminal {
+      white-space: pre-wrap;
+      padding: 20px;
+      font-size: 16px;
+    }
+
+    .glitch {
+      animation: glitch 0.3s infinite;
+    }
+
+    @keyframes glitch {
+      0% { transform: translate(0, 0); }
+      25% { transform: translate(-2px, 2px); }
+      50% { transform: translate(2px, -1px); }
+      75% { transform: translate(-1px, -1px); }
+      100% { transform: translate(0, 0); }
     }
   </style>
 </head>
-<body class="bg-gray-900 text-white text-center min-h-screen flex flex-col items-center justify-center">
+<body onclick="startVirus()">
 
-  <h1 class="text-3xl font-bold mb-4">🦠 Virus Simulator</h1>
-  <canvas id="simCanvas" width="600" height="400"></canvas>
-  <button onclick="startSimulation()" class="mt-6 px-6 py-2 bg-blue-500 hover:bg-blue-600 rounded">Start Simulation</button>
+  <div id="terminal" class="terminal">
+    CLICK TO START SIMULATION...
+  </div>
 
   <script>
-    const canvas = document.getElementById("simCanvas");
-    const ctx = canvas.getContext("2d");
+    const terminal = document.getElementById('terminal');
 
-    const NUM_PEOPLE = 100;
-    const INFECTION_RADIUS = 10;
-    const INFECTION_CHANCE = 0.05;
-    const RECOVERY_TIME = 500;
-
-    class Person {
-      constructor(x, y) {
-        this.x = x;
-        this.y = y;
-        this.vx = Math.random() * 2 - 1;
-        this.vy = Math.random() * 2 - 1;
-        this.status = "healthy"; // healthy, infected, recovered
-        this.infectedTime = 0;
-      }
-
-      move() {
-        this.x += this.vx;
-        this.y += this.vy;
-
-        // Bounce off walls
-        if (this.x <= 0 || this.x >= canvas.width) this.vx *= -1;
-        if (this.y <= 0 || this.y >= canvas.height) this.vy *= -1;
-      }
-
-      draw() {
-        if (this.status === "healthy") ctx.fillStyle = "lime";
-        else if (this.status === "infected") ctx.fillStyle = "red";
-        else ctx.fillStyle = "dodgerblue";
-
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, 4, 0, Math.PI * 2);
-        ctx.fill();
-      }
+    function getRandomMessage() {
+      const messages = [
+        "Scanning system32\\virus.exe...",
+        "Encrypting files...",
+        "Uploading user data to hacker cloud...",
+        "System compromised!",
+        "Injecting malware...",
+        "Establishing backdoor...",
+        "Bitcoin miner installed.",
+        "Deleting registry...",
+        "Access granted. 🛑",
+        "Initiating critical failure.",
+        "FBI WARNING: Illegal Activity Detected."
+      ];
+      return messages[Math.floor(Math.random() * messages.length)];
     }
 
-    let people = [];
-
-    function init() {
-      people = [];
-      for (let i = 0; i < NUM_PEOPLE; i++) {
-        const x = Math.random() * canvas.width;
-        const y = Math.random() * canvas.height;
-        const person = new Person(x, y);
-        people.push(person);
-      }
-      people[Math.floor(Math.random() * NUM_PEOPLE)].status = "infected";
+    function startVirus() {
+      terminal.innerText = "VIRUS SIMULATION ACTIVE...\n\n";
+      document.body.classList.add('glitch');
+      setInterval(() => {
+        terminal.innerText += getRandomMessage() + "\n";
+        terminal.scrollTop = terminal.scrollHeight;
+        spawnPopup();
+      }, 800);
     }
 
-    function update() {
-      for (let p of people) {
-        p.move();
-
-        // Check infection
-        if (p.status === "infected") {
-          p.infectedTime++;
-          for (let other of people) {
-            if (other.status === "healthy") {
-              const dx = p.x - other.x;
-              const dy = p.y - other.y;
-              const distance = Math.sqrt(dx * dx + dy * dy);
-              if (distance < INFECTION_RADIUS && Math.random() < INFECTION_CHANCE) {
-                other.status = "infected";
-              }
-            }
-          }
-          if (p.infectedTime > RECOVERY_TIME) {
-            p.status = "recovered";
-          }
-        }
-      }
-    }
-
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      for (let p of people) {
-        p.draw();
-      }
-    }
-
-    function loop() {
-      update();
-      draw();
-      requestAnimationFrame(loop);
-    }
-
-    function startSimulation() {
-      init();
-      loop();
+    function spawnPopup() {
+      const popup = document.createElement('div');
+      popup.className = 'popup';
+      popup.style.top = `${Math.random() * window.innerHeight}px`;
+      popup.style.left = `${Math.random() * window.innerWidth}px`;
+      popup.innerHTML = `
+        <strong>⚠️ CRITICAL ERROR</strong><br>
+        Trojan.Win32.Bitminer Detected<br>
+        <button onclick="this.parentElement.remove()">Close</button>
+      `;
+      document.body.appendChild(popup);
     }
   </script>
-
 </body>
 </html>
